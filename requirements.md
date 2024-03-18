@@ -3,10 +3,10 @@
 # interface
 ## O simulador deve possuir uma maneira de ler um arquivo texto para carregar a memória com instruções e dados. É importante ressaltar, porém, que o simulador não precisa ser “bonito”, mas precisa ser fácil de usar.
 
-- [] Ler um arquivo texto para carregar a memória com instruções e dados.
-- [] Transformar as entradas de instrução em texto para binário(OpCode)
+- [x] Ler um arquivo texto para carregar a memória com instruções e dados.
+- [x] Transformar as entradas de instrução em texto para binário(OpCode)
 - [x] Criar uma mémoria Virtual em Vetor de unsigned char memoria[154], a memória possui apenas 154 endereços, abrangendo os endereços de 0 (0x0) a 153 (0x99).
-- [] Salvar instruçoes tranformadas nas posições de mémoria virtual.
+- [x] Salvar instruçoes tranformadas nas posições de mémoria virtual.
 - [] Imprimir mapa da memoria no terminal
 - [] Mostrar o conteúdo dos registradores no fim de cada ciclo de máquina, 
 - - [] Imprimir mapa da CPU, valores dos registradores internos a cada execução. 
