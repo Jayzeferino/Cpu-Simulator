@@ -1,7 +1,10 @@
 # Para executar o programa:
 - compile o programa e gere o executável ;
 - insira as instrucoes no arquivo inputCMD.txt;
-` 0;i;ld r0, 57
+
+
+```
+0;i;ld r0, 57
 4;i;ld r1, 58
 8;i;ld r2, 59
 c;i;ld r3, 5A
@@ -16,7 +19,9 @@ c;i;ld r3, 5A
 58;d;3
 59;d;4
 5A;d;5
-63;d;3 `
+63;d;3
+```
+
 >[!NOTE]
    >
    >o codigo acima é um exemplo de como deve ser o conteúdo do arquivo inputCMD.txt
