@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include <string.h>
 
-unsigned int MEMORIA[100];
+unsigned char MEMORIA[154];
 unsigned int MBR;
 unsigned int MAR;
 unsigned char IR;
@@ -220,10 +220,9 @@ int hex_to_decimal(unsigned int hex_num) {
 void printMemory(){
     int index = 0;
   
-    for (int i = 0; i < 100; i++) {
-        
+    for (int i = 0x0; i <= 0x99 ; i++) {
         printf("%X %X  \n ", i, MEMORIA[i]);
-    }
+   }
 }
 
 void fileToMemory(int argc, char *argv[]){
@@ -259,12 +258,28 @@ void fileToMemory(int argc, char *argv[]){
             // printf("Endereco: %x, Tipo: %c, Instruction: %s \n", 
             // nova_linha.endereco, nova_linha.tipo, nova_linha.instruction);
             if(nova_linha.tipo == 'd'){
-
-              MEMORIA[hex_to_decimal(nova_linha.endereco)] = string_to_hex(nova_linha.instruction);
+                unsigned char data8;
+                unsigned int data32 = string_to_hex(nova_linha.instruction);
+                int count = 32;
+                printf("Alocando instruçao %X na memoria apartir da posicao %X .... \n", data32, hex_to_decimal(nova_linha.endereco));
+                for (int i = hex_to_decimal(nova_linha.endereco); i < (hex_to_decimal(nova_linha.endereco) + 4) ; i++) {
+                    count = count - 8;
+                    data8 = data32 >> count;
+                    MEMORIA[i] =   data8;
+                }
+               
             }    
 
             if(nova_linha.tipo == 'i'){
-               MEMORIA[hex_to_decimal(nova_linha.endereco)] =   convertInstructionToBinary(nova_linha);
+                unsigned char data8;
+                unsigned int data32 = convertInstructionToBinary(nova_linha);
+                int count = 32;
+                printf("Alocando instruçao %X na memoria apartir da posicao %X .... \n", data32, hex_to_decimal(nova_linha.endereco));
+                for (int i = hex_to_decimal(nova_linha.endereco); i < (hex_to_decimal(nova_linha.endereco) + 4) ; i++) {
+                    count = count - 8;
+                    data8 = data32 >> count;
+                    MEMORIA[i] =   data8;
+                }
             }    
             
             linhas[num_linhas] = nova_linha;
