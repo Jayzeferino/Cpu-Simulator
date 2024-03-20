@@ -10,7 +10,7 @@ unsigned char RO0;
 unsigned char RO1;
 unsigned char RO2;
 unsigned int IMM;
-unsigned int PC;
+unsigned int PC= 0x0;
 unsigned char E, L, G;
 unsigned int REG[16];
 
@@ -261,7 +261,6 @@ void fileToMemory(int argc, char *argv[]){
                 unsigned char data8;
                 unsigned int data32 = string_to_hex(nova_linha.instruction);
                 int count = 32;
-                printf("Alocando instruçao %X na memoria apartir da posicao %X .... \n", data32, hex_to_decimal(nova_linha.endereco));
                 for (int i = hex_to_decimal(nova_linha.endereco); i < (hex_to_decimal(nova_linha.endereco) + 4) ; i++) {
                     count = count - 8;
                     data8 = data32 >> count;
@@ -293,17 +292,75 @@ void fileToMemory(int argc, char *argv[]){
     }
 }
 
-void cpu();
+void cpuBusca(unsigned int pc){
 
-void buscaCpu(){
+    printf("PC= %X\n", PC);
+
+    MBR = MEMORIA[PC];  // recebe os primeiros 8bits da memoria
+
+    for (int i = PC; i < (PC + 4); i++) // transfere de 8 em 8 bits até os 32 bits
+    {
+        MBR = MBR << 8;
+        MBR = MBR | MEMORIA[i];
+    }
+
+    printf("MBR = %X \n", MBR);
+
+    PC=+4;
+}
+
+void cpuDecodifica(){
+
+    // unsigned int MBR;
+    // unsigned int MAR;
+    // unsigned char IR;
+    // unsigned char RO0;
+    // unsigned char RO1;
+    // unsigned char RO2;
+    // unsigned int IMM;
+    // unsigned int PC= 0x0;
+    // unsigned char E, L, G;
+    unsigned char IR = MBR >> 27;
+
+
+    printf("opCode= %X\n", IR);
+
+    if(IR < 0x3){
+       
+    }
+
+    if(IR >= 0x3 && IR < 0x5){
+       
+    }
+
+    if(IR >= 0x5 && IR < 0x7){
+       
+    }
+
+    if(IR >= 0x7 && IR < 0xE){
+       
+    }
+
+    if(IR >= 0xE && IR < 0x18){
+       
+    }
+
+    if(IR >= 0x18 && IR < 0x1E){
+       
+    }
+
 
 }
 
 void cpu(){
+   
+    //busca 
 
-    //busca
+    cpuBusca(PC);
 
     // decodifica
+
+    cpuDecodifica();
 
     // executa
 
