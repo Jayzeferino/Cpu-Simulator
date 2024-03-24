@@ -13,6 +13,7 @@ unsigned int IMM;
 unsigned int PC= 0x0;
 unsigned char E, L, G;
 unsigned int REG[16];
+unsigned char RUN = 1;
 
 #define MAX_LINE_LENGTH 1000
 
@@ -21,8 +22,6 @@ typedef struct {
     char tipo;
     char instruction[30];
 } Linha;
-
-void interface();
 
 unsigned char textToOpCode(char inst[30]){
 
@@ -219,12 +218,19 @@ int hex_to_decimal(unsigned int hex_num) {
 
 void printMemory(){
     int index = 0;
-  
+    int j=0;
     for (int i = 0x0; i <= 0x99 ; i++) {
-        printf("%X %X  \n ", i, MEMORIA[i]);
+        if(j==8){
+            printf("\n");
+            j=0;
+        }
+        printf("%X: %X    ", i, MEMORIA[i]);
+        j++;
    }
+   printf("\n\n");
 }
 
+void printState();
 void fileToMemory(int argc, char *argv[]){
     FILE *fp;
     char *filename;
@@ -239,7 +245,6 @@ void fileToMemory(int argc, char *argv[]){
     else
     {
         filename = argv[1];
-        printf("Lendo Arquivo de Intruçoes ..  : %s\n", filename);
     }
 
     // Open file in read-only mode
@@ -255,8 +260,7 @@ void fileToMemory(int argc, char *argv[]){
         while (fgets(linha, sizeof(linha), fp) != NULL && num_linhas < MAX_LINE_LENGTH) {
             Linha nova_linha;
             sscanf(linha, "%x;%c;%[^\n]", &nova_linha.endereco, &nova_linha.tipo, nova_linha.instruction);
-            // printf("Endereco: %x, Tipo: %c, Instruction: %s \n", 
-            // nova_linha.endereco, nova_linha.tipo, nova_linha.instruction);
+        
             if(nova_linha.tipo == 'd'){
                 unsigned char data8;
                 unsigned int data32 = string_to_hex(nova_linha.instruction);
@@ -273,7 +277,6 @@ void fileToMemory(int argc, char *argv[]){
                 unsigned char data8;
                 unsigned int data32 = convertInstructionToBinary(nova_linha);
                 int count = 32;
-                printf("Alocando instruçao %X na memoria apartir da posicao %X .... \n", data32, hex_to_decimal(nova_linha.endereco));
                 for (int i = hex_to_decimal(nova_linha.endereco); i < (hex_to_decimal(nova_linha.endereco) + 4) ; i++) {
                     count = count - 8;
                     data8 = data32 >> count;
@@ -285,14 +288,14 @@ void fileToMemory(int argc, char *argv[]){
             num_linhas++;
         }
         
-        printMemory();
+        printState();
         fclose(fp); 
     } else {
             printf("Failed to open the file\n");
     }
 }
 
-void cpuBusca(unsigned int pc){
+void cpuBusca(){
     MBR = MEMORIA[PC];  // recebe os primeiros 8bits da memoria
 
     for (int i = PC; i < (PC + 4); i++) // transfere de 8 em 8 bits até os 32 bits
@@ -300,72 +303,205 @@ void cpuBusca(unsigned int pc){
         MBR = MBR << 8;
         MBR = MBR | MEMORIA[i];
     }
-    PC=+4;
 }
 
 void cpuDecodifica(){
 
-    
-    unsigned char IR = MBR >> 27;
+    IR = MBR >> 27;
+    PC= PC + 0x4;
 
     if(IR < 0x3){
-       PC=PC+1;
     }
 
     if(IR >= 0x3 && IR < 0x5){
-       PC=PC+1;
        RO0 = MBR >> 23 & 0xF;
        RO1 = MBR >> 19 & 0xF;
     }
 
     if(IR >= 0x5 && IR < 0x7){
-        PC=PC+1;
         RO0 = MBR >> 23 & 0xF;
         RO1 = MBR >> 19 & 0xF;
         MAR = MBR & 0x7FFFF;
     }
 
     if(IR >= 0x7 && IR < 0xE){
-        PC=PC+1;
         RO0 = MBR >> 23 & 0xF;
         RO1 = MBR >> 19 & 0xF;
         RO2 = MBR >> 15 & 0xF;
     }
 
     if(IR >= 0xE && IR < 0x10){
-        PC=PC+1;
         RO0 = MBR >> 23 & 0xF;
         MAR = MBR & 0X7FFFFF;
     }
 
     if(IR >= 0x10 && IR < 0x18){
-        PC=PC+1;
         RO0 = MBR >> 23 & 0xF;
         IMM = MBR & 0X7FFFFF;
        
     }
 
     if(IR >= 0x18 && IR < 0x1E){
-        PC=PC+1;
         MAR = MBR & 0X7FFFFF;
     }
-    // printf("MBR= %X\n", MBR);
-    // printf("MAR= %X\n", MAR);
-    // printf("IR = %X\n", IR);
-    // printf("RO0=%X, RO1=%X , RO2=%X\n", RO0, RO1, RO2);
-    // printf("E=%X, L=%X , G=%X\n", E, L, G);
+    
+}
+void printState(){
+    
+    printf("R0=%X, R1=%X, R2=%X, R3=%X \n", REG[0],REG[1],REG[2],REG[3]);
+    printf("R4=%X, R5=%X, R6=%X, R7=%X \n", REG[4],REG[5],REG[6],REG[7]);
+    printf("R8=%X, R9=%X, R10=%X, R11=%X \n", REG[8],REG[9],REG[10],REG[11]);
+    printf("R12=%X, R13=%X, R14=%X, R15=%X \n", REG[12],REG[13],REG[14],REG[15]);
+    printf("MBR=%X, MAR=%X, IMM=%X, PC=%X \n", MBR, MAR, IMM, PC);
+    printf("IR= %X, RO0=%X, RO1=%X, RO2=%X\n",IR, RO0, RO1, RO2);
+    printf("E= %X, L= %X , G= %X \n", E, L, G);
+    printf("\n\n\n");
+    printMemory();
+}
+void cpuExe(){
+
+    if (IR == 0x0){
+        RUN = 0;
+    }
+    if (IR == 0x1){}
+    if (IR == 0x2){
+        REG[RO0] = ~RO0;
+    }
+    if (IR == 0x3){
+        REG[RO0] = REG[RO1];
+    }
+    if (IR == 0x4){
+        if (REG[RO0] == REG[RO1] ){ E = 1; }else{ E = 0;}
+        if (REG[RO0] < REG[RO1] ){ L = 1; }else{ L = 0;}
+        if (REG[RO0] > REG[RO1] ){ G = 1; }else{ G = 0;}
+    }
+    if (IR == 0x5){
+        REG[RO0]= REG[MAR + RO1]; 
+    }
+    if (IR == 0x6){
+        REG[MAR + RO1] = REG[RO0]; 
+    }
+    if (IR == 0x7){
+        REG[RO0]= REG[RO1] + REG[RO2];
+    }
+    if (IR == 0x8){
+        REG[RO0]= REG[RO1] - REG[RO2];
+    }
+    if (IR == 0x9){
+        REG[RO0]= REG[RO1] * REG[RO2];
+    }
+    if (IR == 0xA){
+        REG[RO0]= REG[RO1] / REG[RO2];
+    }
+    if (IR == 0xB){
+        REG[RO0]= REG[RO1] & REG[RO2];
+    }
+    if (IR == 0xC){
+        REG[RO0]= REG[RO1] | REG[RO2];
+    }
+    if (IR == 0xD){
+        REG[RO0]= REG[RO1] ^ REG[RO2];
+    }
+    if (IR == 0xE){
+        REG[RO0]= MEMORIA[MAR];  // recebe os primeiros 8bits da memoria
+        for (int i = MAR; i < (MAR + 4); i++) // transfere de 8 em 8 bits até os 32 bits
+        {
+            REG[RO0] = REG[RO0] << 8;
+            REG[RO0] = REG[RO0] | MEMORIA[i];
+            
+        }
+    }
+    if (IR == 0xF){
+        int count = 32;
+        for (int i = MAR; i < (MAR + 4) ; i++) {
+            count = count - 8;
+            MEMORIA[i] = REG[RO0] >> count;
+        }
+    }
+    if (IR == 0x10){
+      REG[RO0] = 0;
+      REG[RO0] = IMM & 0xFFFF;
+    }
+    if (IR == 0x11){
+      REG[RO0] = 0;
+      REG[RO0] = IMM >> 16;
+    }
+    if (IR == 0x12){
+      REG[RO0]= REG[RO0] + IMM;
+    }
+    if (IR == 0x13){
+      REG[RO0]= REG[RO0] - IMM;
+    }
+    if (IR == 0x14){
+      REG[RO0]= REG[RO0] * IMM;
+    }
+    if (IR == 0x15){
+      REG[RO0]= REG[RO0] / IMM;
+    }
+    if (IR == 0x16){
+      REG[RO0]= REG[RO0] >> IMM;
+    }
+    if (IR == 0x17){
+      REG[RO0]= REG[RO0] << IMM;
+    }
+    if (IR == 0x18){
+        if (E == 1)
+        {
+            PC = MAR;
+        }
+    }
+    if (IR == 0x19){
+        if (!(E == 1))
+        {
+            PC = MAR;
+        }
+    }
+    if (IR == 0x1A){
+        if (L == 1)
+        {
+            PC = MAR;
+        }
+    }
+    if (IR == 0x1B){
+        if ((L == 1 || E == 1))
+        {
+            PC = MAR;
+
+        }
+    }
+    if (IR == 0x1C){
+        if (G == 1)
+        {
+            PC = MAR;
+        }
+    }
+    if (IR == 0x1D){
+        if ((G == 1 || E == 1))
+        {
+           PC = MAR;
+        }
+    }
+    if (IR == 0x1E){
+       
+        PC = MAR;
+        
+    }
+  
 }
 
 void cpu(){
-   
     //busca 
-
-    cpuBusca(PC);
+   
+    cpuBusca();
 
     // decodifica
 
     cpuDecodifica();
 
     // executa
+    
+    cpuExe();
 
+    //imprime o estado da cpu
+    printState();
 }
