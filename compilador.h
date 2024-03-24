@@ -293,9 +293,6 @@ void fileToMemory(int argc, char *argv[]){
 }
 
 void cpuBusca(unsigned int pc){
-
-    printf("PC= %X\n", PC);
-
     MBR = MEMORIA[PC];  // recebe os primeiros 8bits da memoria
 
     for (int i = PC; i < (PC + 4); i++) // transfere de 8 em 8 bits até os 32 bits
@@ -303,53 +300,60 @@ void cpuBusca(unsigned int pc){
         MBR = MBR << 8;
         MBR = MBR | MEMORIA[i];
     }
-
-    printf("MBR = %X \n", MBR);
-
     PC=+4;
 }
 
 void cpuDecodifica(){
 
-    // unsigned int MBR;
-    // unsigned int MAR;
-    // unsigned char IR;
-    // unsigned char RO0;
-    // unsigned char RO1;
-    // unsigned char RO2;
-    // unsigned int IMM;
-    // unsigned int PC= 0x0;
-    // unsigned char E, L, G;
+    
     unsigned char IR = MBR >> 27;
 
-
-    printf("opCode= %X\n", IR);
-
     if(IR < 0x3){
-       
+       PC=PC+1;
     }
 
     if(IR >= 0x3 && IR < 0x5){
-       
+       PC=PC+1;
+       RO0 = MBR >> 23 & 0xF;
+       RO1 = MBR >> 19 & 0xF;
     }
 
     if(IR >= 0x5 && IR < 0x7){
-       
+        PC=PC+1;
+        RO0 = MBR >> 23 & 0xF;
+        RO1 = MBR >> 19 & 0xF;
+        MAR = MBR & 0x7FFFF;
     }
 
     if(IR >= 0x7 && IR < 0xE){
-       
+        PC=PC+1;
+        RO0 = MBR >> 23 & 0xF;
+        RO1 = MBR >> 19 & 0xF;
+        RO2 = MBR >> 15 & 0xF;
     }
 
-    if(IR >= 0xE && IR < 0x18){
+    if(IR >= 0xE && IR < 0x10){
+        PC=PC+1;
+        RO0 = MBR >> 23 & 0xF;
+        MAR = MBR & 0X7FFFFF;
+    }
+
+    if(IR >= 0x10 && IR < 0x18){
+        PC=PC+1;
+        RO0 = MBR >> 23 & 0xF;
+        IMM = MBR & 0X7FFFFF;
        
     }
 
     if(IR >= 0x18 && IR < 0x1E){
-       
+        PC=PC+1;
+        MAR = MBR & 0X7FFFFF;
     }
-
-
+    // printf("MBR= %X\n", MBR);
+    // printf("MAR= %X\n", MAR);
+    // printf("IR = %X\n", IR);
+    // printf("RO0=%X, RO1=%X , RO2=%X\n", RO0, RO1, RO2);
+    // printf("E=%X, L=%X , G=%X\n", E, L, G);
 }
 
 void cpu(){
