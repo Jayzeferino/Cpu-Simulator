@@ -8,8 +8,8 @@
 - [x] Criar uma mémoria Virtual em Vetor de unsigned char memoria[154], a memória possui apenas 154 endereços, abrangendo os endereços de 0 (0x0) a 153 (0x99).
 - [x] Salvar instruçoes tranformadas nas posições de mémoria virtual.
 - [] Imprimir mapa da memoria no terminal
-- [] Mostrar o conteúdo dos registradores no fim de cada ciclo de máquina, 
-- - [] Imprimir mapa da CPU, valores dos registradores internos a cada execução. 
+- [x] Mostrar o conteúdo dos registradores no fim de cada ciclo de máquina, 
+- - [x] Imprimir mapa da CPU, valores dos registradores internos a cada execução. 
 
 # implementacao CPU 
 ## a CPU a ser implementada processa apenas números inteiros contidos em palavras de 32 bits e, portanto, não há nenhuma operação com ponto-flutuante, BCD ou números inteiros de outros tamanhos.
@@ -23,6 +23,7 @@
 - [x] E, L e G – registradores internos que armazenam as flags ‘equal to’, ‘lower than’ e ‘greater than’- unsigned char e, unsigned char l, unsigned char g - 8 bits
 - [x] PC – Program Counter –  unsigned int pc - 32bits
 - [x] r0 a r15 –  registradores de propósito-geral - unsigned int reg[16] - vetor de 16 posiçoes de 32 bits.
-- [] implementar o conjunto de instruçoes
-- []  todas as transferências entre MBR e a memória devem
+- [x] implementar o conjunto de instruçoes
+- [x]  todas as transferências entre MBR e a memória devem
 ser de byte em byte.
+- verificar funcoes soma
