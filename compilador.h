@@ -97,10 +97,31 @@ unsigned int convertInstructionToBinary(Linha linha){
     bitWord = opCode;
     int cont = 1;
     
-    
-    if(opCode < 0x3){
+    if(opCode < 0x2){
         bitWord = opCode;
         bitWord  = bitWord << 27;
+    }
+    if(opCode == 0x2){
+        bitWord = opCode;
+        bitWord = bitWord << 4;
+        unsigned char reg;
+        unsigned int memPos;
+
+        while (cont <= 2) {
+
+            token = strtok(NULL, ", ");
+
+            if(cont == 1){
+                reg = textToReg(token);
+                bitWord =  bitWord | reg;
+            }
+            
+            if(cont == 2){
+                bitWord = bitWord << 23;
+            }
+            
+            cont ++;
+        }
     }
 
     if(opCode >= 0x3 && opCode < 0x5){
@@ -312,6 +333,9 @@ void cpuDecodifica(){
 
     if(IR < 0x3){
     }
+    if(IR ==2){
+        RO0 = MBR >> 23 & 0xF;
+    }
 
     if(IR >= 0x3 && IR < 0x5){
        RO0 = MBR >> 23 & 0xF;
@@ -363,9 +387,11 @@ void cpuExe(){
     if (IR == 0x0){
         RUN = 0;
     }
-    if (IR == 0x1){}
+    if (IR == 0x1){
+        PC=PC+4;
+    }
     if (IR == 0x2){
-        REG[RO0] = ~RO0;
+        REG[RO0] = ~REG[RO0];
     }
     if (IR == 0x3){
         REG[RO0] = REG[RO1];
