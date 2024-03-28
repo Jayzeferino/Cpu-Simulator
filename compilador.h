@@ -402,10 +402,21 @@ void cpuExe(){
         if (REG[RO0] > REG[RO1] ){ G = 1; }else{ G = 0;}
     }
     if (IR == 0x5){
-        REG[RO0]= REG[MAR + RO1]; 
+        MAR = MAR + REG[RO1];
+        for (int i = 1; i <=4 ; i++)
+        {
+            REG[RO0]= MEMORIA[MAR]; 
+            MAR++;
+        }
+        
     }
     if (IR == 0x6){
-        REG[MAR + RO1] = REG[RO0]; 
+        MAR = MAR + REG[RO1];
+        for (int i = 1; i <=4 ; i++)
+        {
+            MEMORIA[MAR] = REG[RO0];
+            MAR++;
+        }
     }
     if (IR == 0x7){
         REG[RO0]= REG[RO1] + REG[RO2];
@@ -449,8 +460,8 @@ void cpuExe(){
       REG[RO0] = IMM & 0xFFFF;
     }
     if (IR == 0x11){
-      REG[RO0] = 0;
-      REG[RO0] = IMM >> 16;
+      
+      REG[RO0] = REG[RO0] | IMM >> 16;
     }
     if (IR == 0x12){
       REG[RO0]= REG[RO0] + IMM;
